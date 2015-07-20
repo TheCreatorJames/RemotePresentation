@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en" ng-app>
+  <head>
+    <title>Presentation Controller</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+   
+    
+<style>
+.Pink
+{
+	background-color: pink;
+}
+
+.LightGreen
+{
+	background-color: lightgreen;
+}
+
+.padder
+{
+	padding: 4px;
+}
+
+.mainBody {
+	padding: 16px;
+}
+</style>
+
+<style type="text/css">
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none; /* Disable selection/copy in UIWebView */
+}
+</style>
+    <script>
+      var socket = null;
+      function init()
+      {
+        socket = io.connect();
+        AddCommand("Parse", "Command", "parse");
+        AddCommand("Hello", "Everyone", "Hard Times Presentation { Chapter } By Jesse Mitchell { ChapterSubtitle } AP English IV { ChapterSubtitle br br } Thank you in advance, and hello everyone! { Label br }");
+        AddCommand("Yes", "", "Yes. I wrote this. { ChapterSubtitle }");
+        AddCommand("Yes", "Button", "Yes. I had a button for this. { ChapterSubtitle }");
+        AddCommand("Say", "Yes", "Yes. { ChapterSubtitle }");
+        AddCommand("Say", "Yes 2", "The answer is Yes. { ChapterSubtitle }");
+        AddCommand("Say", "No", "No. { ChapterSubtitle }");
+        AddCommand("Ask", "Again Later", "Ask again later. { ChapterSubtitle }");
+        AddCommand("Hard", "Times", "Hard Times { Title } Charles Dickens. Novel Research. Yeah... { i Subtitle br br } - Dickens History. { Label br } - Industrial Era. { Label br } - Setting. { Label br br br br } Possible Information:<br>Other Dickens Novels, Description of Industrial Era Society. { Label }");
+        AddCommand("Characters", "", "Characters in Hard Times { Title br } - Gradgrinds (the whole lot of 'em) { ChapterSubtitle } - Sissy { ChapterSubtitle } - Bounderby { ChapterSubtitle }")
+	  		AddCommand("Aspects", "", "Aspects { Title } What's so special about this novel anyway? Well... { i ChapterSubtitle br } - Criticism of Inhumane Society. { Label br } - Criticism of European Economics { Label br } - Role of Economics in the Morals of the Society { Label br }");
+	  		AddCommand("Research", "", "Research { Title } Well, you know. The stuff we've been working on these last few weeks? { i ChapterSubtitle br } In my research, I wanted to branch out from Dicken's criticism of European economic philosophies, and criticize them for the caloussness they inherently bring with them. { Label br }");
+	  		AddCommand("Economics", "", "European Economics { Title } The... uh... types of economies. { i ChapterSubtitle br } - Marxism. { Label br } - Utilitarianism. (and how they're linked) { Label br }")
+				AddCommand("Dickens", "Right", "Was Dickens Right? { Title } The proof is in our History. { i ChapterSubtitle br } - Nazism. (Germany. The Third Reich) { Label br } - Communism. (Soviet Union. Their Culture). { Label br }")
+		
+	
+        //socket.emit('Hey', {data: 'hey'});
+      }
+      
+      
+      //This is hacking an old project with another project
+//Written by Jesse Mitchell.
+//Meant to Demonstrate other Capabilities I could add to my services.
+function shrink(lnk, value)
+{
+	document.getElementById("mainBody").style.opacity = "" + value;
+	if(value > -0.25)
+	setTimeout(function() { shrink(lnk, value-.1); }, 43);
+	else document.location.replace(lnk);
+}
+
+
+var currentlyChecked = {}; //List of People Checked Or Unchecked
+var extraNotes = {}; //Extra Notes on the People.
+var secs = 0; //Time elapsed detection.
+var fix = false; //Fixes the problem of typing in a prompt.
+var cancel = false; //Cancels when scrolling.
+
+/*
+ * This fires when the panel is tapped. It sets the current time to later
+ * check for elapsed time.
+ */
+function onTap(el)
+{
+	if(fix) { return (fix); }
+	el.classList.add("Pink");
+
+	var date = new Date();
+	secs = date.getTime();
+	
+
+
+	//Checks if a person has been checked or not. If the person has not been checked, it adds
+	//them to the check/unchecked list :P.
+	if(currentlyChecked[el.textContent || el.innerText] === undefined)
+	{
+		currentlyChecked[el.textContent || el.innerText] = false;
+		
+		extraNotes[el.textContent || el.innerText] = "";
+	}
+	cancel = false;
+	lastScroll = 0;
+	el.classList.remove("LightGreen");
+}
+
+/* 
+ * This function is fired when the panel is released.
+ * It will detect the time elapsed to allow it to determine the appropriate action to be taken.
+ */
+function onRelease(el)
+{
+	try
+	{
+	if(fix)
+	{
+		fix = false;
+		return fix;
+	} 
+	el.classList.remove("Pink");
+	if(currentlyChecked[el.textContent || el.innerText])
+	{
+		el.classList.add("LightGreen");
+		
+	}
+	
+	var secsTwo = (new Date()).getTime() - secs;
+
+	
+	
+	if(Math.abs(secsTwo) >= 740)
+	{
+	
+		
+		if(cancel)
+		{		
+			cancel = false;
+			lastScroll = 0;
+			return cancel;
+		}
+
+		extraNotes[el.textContent || el.innerText] =  prompt();
+	
+		fix = true;
+
+		el.parentNode.classList.add("panel");
+
+		var nod = el.parentNode;
+
+		//Detects if notes are already added, if not, it adds them. Checks if notes are not empty and not null.
+		if(nod.innerHTML.indexOf("<br>Notes: ") == -1 && extraNotes[el.textContent || el.innerText] != null && extraNotes[el.textContent || el.innerText].length > 0)
+		{
+			nod.innerHTML += "<br>Notes: " + extraNotes[el.textContent || el.innerText] + "<br>";
+		}
+		else
+		{
+			//detects if notes are added, adds them if not.
+			if(nod.innerHTML.indexOf("<br>Notes: ") != -1)
+			nod.innerHTML = nod.innerHTML.substring(0, nod.innerHTML.indexOf("<br>Notes: "));
+			//adds notes if they're not null or empty.
+			if(extraNotes[el.textContent || el.innerText] != null && extraNotes[el.textContent || el.innerText].length > 0)
+			{
+				nod.innerHTML += "<br>Notes: " + extraNotes[el.textContent || el.innerText];
+			} else
+			{		
+				nod.classList.remove("panel");
+			}
+		}
+	}
+	else
+	if(Math.abs(secsTwo) >= 250)
+	{
+
+		if(cancel)  
+		{
+
+		cancel = false;
+		lastScroll = 0;
+		 return (cancel); 
+ 
+		}
+		
+		
+		
+	if(currentlyChecked[el.textContent || el.innerText] == true)
+	{
+		el.classList.remove("LightGreen");
+		
+	} else
+	{
+		el.classList.add("LightGreen");
+	}
+
+	currentlyChecked[el.textContent || el.innerText] = !currentlyChecked[el.textContent || el.innerText];
+	
+		if(el.dataset.inf == "parse")
+	{
+		socket.emit('ShowSlide', { data: prompt() });
+		fix = true; //Hopefully that'll work xD.
+	}
+	else
+  socket.emit('ShowSlide', { data: el.dataset.inf });
+	}
+	else
+	{
+		
+	}
+ 
+	if(currentlyChecked[el.textContent || el.innerText] == false)
+	{
+		el.classList.remove("LightGreen");
+	} else
+	{
+		el.classList.add("LightGreen");
+	}
+
+	secs = 0;
+	} catch(ex)
+	{
+
+		alert(ex);
+	}	
+
+
+}
+
+
+var lastScroll = 0;
+
+/*	This method is designed to
+ *  help users not accidentally tap on people
+ *  while they are scrolling :)
+ */
+window.ontouchmove = function(e)
+{
+	if(secs != 0)
+	{
+		if(lastScroll == 0)
+		{
+			lastScroll = window.scrollY;
+		}
+		//The "other" cosmic ray fix will be here. To help with stuttering.
+		//There's an issue where finger stuttering or electromagnetic pulsing will affect the 
+		//system stupidly. This fixes this issue.
+		//So does the other method that is "onscroll".
+		else if (lastScroll == window.scrollY) 
+		{
+			cancel = false;
+		}
+		else
+		cancel = true;
+	}
+}
+
+/* Hands and fingers slip and stutter, this helps correct the finger stuttering that barely scrolls.
+ * It will work well to correct finger electromagnetic pulses.
+ * This was my "cosmic ray" bug.
+ * It compares the starting scrolling position to the current, if it has barely moved a pixel
+ * it will cancel the "cancel" :p.
+ */
+window.onscroll = function(e)
+{
+	var currentScroll = window.scrollY;
+
+	if(Math.abs(currentScroll - lastScroll) <= 5)
+	{
+		cancel = false;
+	}
+
+	lastScroll = 0;
+}
+
+
+//This will remove the mouse down event and allow me to keep things to a single
+//file.
+//The un-needed events will be freed up and garbage collected.
+function onTapTablet(el)
+{
+	if(el.onmousedown !== undefined)
+	{
+		onTapMouse = undefined;
+		onReleaseMouse = undefined;
+		el.onmousedown = undefined;
+		el.onmouseup = undefined;
+	}
+	
+
+	return onTap(el);
+}
+
+//For tablets.
+function onReleaseTablet(el)
+{
+ 	return onRelease(el);
+}
+
+//For Computers.
+function onTapMouse(el)
+{
+	
+	return onTap(el);
+}
+
+//For Computers.
+function onReleaseMouse(el)
+{
+
+	return onRelease(el);
+}
+
+
+//Adds people with first and last names to the list.
+//Works simply by adding HTML to the page dynamically.
+function AddCommand(first, last, info)
+{
+	document.getElementById("mainBody").innerHTML += "<div class=\"\"><div data-inf=\"" + info + "\" class=\"panel\" ontouchstart=\"onTapTablet(this)\" onmousedown=\"onTapMouse(this)\" onmouseup=\"onReleaseMouse(this)\" ontouchend=\"onReleaseTablet(this)\"><p align=\"center\">" + first + " " + last  + "</p></div></div><br/>";
+}
+
+
+
+
+
+
+
+      
+      
+    </script>
+  </head>
+  <body onload="init()">
+    <nav class="top-bar">
+<ul class = "title-area">
+<li class="name">
+<h1><a href="Foundation.html">Presentation Controller</a></h2>
+</li>
+</ul>
+<section class="top-bar-section">
+<ul class = "right">
+</ul>
+</section>
+</nav>
+<div class="callout panel">
+This is the controller for my presentation.
+</div>
+
+
+<br/>
+<div id="mainBody" class = "mainBody">
+<br/>
+</div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en" ng-app>
+  <head>
+    <title>Presentation Viewer</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+.MakeWhite
+{
+	background: white;
+}
+
+.Padder
+{
+	padding: 12px;
+}
+</style>
+ 
+    <script>
+      var socket = null;
+      function init()
+      {
+        socket = io.connect();
+        
+        socket.emit('Presenter', {});
+        
+        socket.on('Display', function(data)
+        {
+        	shrink(null, .8, data.data.toString());
+          
+        });
+        
+      }
+      
+      function Add(el)
+{
+	document.getElementById("mainBody").innerHTML += el;
+}
+
+function br()
+{
+	Add("<br>");
+}
+
+function shrink(lnk, value, toParse)
+{
+	document.getElementById("mainBody").style.opacity = value;
+	if(value > -0.25)
+	setTimeout(function() { shrink(null, value-.1, toParse); }, 43);
+	else 
+	{
+		
+        	document.getElementById("mainBody").innerHTML = "";
+		parse(toParse);
+		document.getElementById("mainBody").style.opacity = 0.99;
+	}
+}
+
+function Title(name)
+{
+	Add("<h3>" + name + "</h3>");
+}
+
+function italicize(content)
+{
+	return "<i>" + content + "</i>";
+}
+
+function bold(content)
+{
+	return "<b>" + content + "</b>";
+}
+
+function hr()
+{
+	Add("<hr>");
+}
+
+function Subtitle(description)
+{
+	Add("<h5 class=\"subheader\">" + description + "</h5>");
+}
+
+function Chapter(name)
+{
+	Add("<h4>" + name + "</h4>");
+}
+
+function ChapterSub(description)
+{
+	Add("<h6 class=\"subheader\">" + description + "</h6>");
+}
+
+function paragraph(content)
+{
+	Add("<p>" + content + "</p>");
+}
+
+function placeInPanel(content)
+{
+	Add("<div class=\"panel\">" + content + "</div>");
+}
+
+function parse(input)
+{
+	try{
+		var inp = input.split(/\{[A-Za-z0-9 ]+\}/);
+		var inp2 = input.match(/\{[A-Za-z0-9 ]+\}/g);
+		
+		for(var i = 0; i < inp2.length; i++)
+		{
+			var splitUpForParsing = inp2[i].split(" ");
+			
+			//inp[i] = htmlescape(inp[i]);
+
+			inp[i] = inp[i].replace(/\/brace\//g, "{");
+			inp[i] = inp[i].replace(/\/cbrace\//g, "}");
+
+			for(var j = 1; j < splitUpForParsing.length - 1; j++)
+			{
+				if(splitUpForParsing[j] == "br" || splitUpForParsing[j] == "break")
+				{
+					br();
+				} else if(splitUpForParsing[j] == "hr" || splitUpForParsing[j] == "line")
+				{
+					hr();
+				}
+				else if(splitUpForParsing[j] == "i")
+				{
+					inp[i] = italicize(inp[i]);
+				}
+				else if(splitUpForParsing[j] == "b") { inp[i] = bold(inp[i]); }
+				else if(splitUpForParsing[j] == "Title")
+				{
+					Title(inp[i]);
+				}
+				else if(splitUpForParsing[j] == "Subtitle")
+				{
+					Subtitle(inp[i]);
+				}
+				else if(splitUpForParsing[j] == "Chapter")
+				{
+					Chapter(inp[i]);
+				}
+				else if(splitUpForParsing[j] == "ChapterSubtitle")
+				{
+					ChapterSub(inp[i]);
+				}
+				else if(splitUpForParsing[j] == "Paragraph")
+				{
+					paragraph(inp[i]);
+				}
+				else if(splitUpForParsing[j] == "Panel")
+				{
+					placeInPanel(inp[i]);
+				}
+				else if(splitUpForParsing[j] == "Label")
+				{
+					placeInLabel(inp[i]);
+				}
+			}
+			
+		}	
+
+
+	}
+	catch(ex) { alert(ex); }
+}
+function placeInLabel(content)
+{
+	Add("<label>" + content + "</label>");
+}
+
+function reddo()
+{
+	document.getElementById("mainBody").innerHTML = "";
+	parse(prompt("What to make?"));
+	redoButton();
+}
+
+function redoButton()
+{
+	Add("<button onclick=\"reddo()\">Redo</button>");
+}
+
+function GetHTMLButton()
+{
+
+	Add("<button onclick=\"getTheHTML()\">Get HTML</button>");
+}
+
+function getTheHTML()
+{
+	prompt("Copy this.", document.body.innerHTML); 
+}
+      
+    </script>
+  </head>
+  <body onload="init()">
+    
+    <nav class="top-bar">
+<ul class = "title-area">
+<li class="name">
+<h1><a href="Foundation.html">Presentation Viewer</a></h2>
+</li>
+</ul>
+<section class="top-bar-section">
+<ul class = "right">
+</ul>
+</section>
+</nav>
+<div class="callout panel">
+This is where the presentation will show up.
+</div>
+
+<div class="MakeWhite Padder" id="mainBody">
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+  </body>
+</html>
