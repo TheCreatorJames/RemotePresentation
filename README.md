@@ -2,7 +2,7 @@
 
 Welcome to the Remote Presentation Software written for Node.js
 
-I used it for an English Project. I wrote it in a single class period.
+I used it for an English Project. I wrote it in a single class period. It allowed me to use my iPad to remotely control the presentation, and inject new information in on the fly as I saw fit.
 
 
 ## Running the server
