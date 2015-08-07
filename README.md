@@ -2,7 +2,10 @@
 
 Welcome to the Remote Presentation Software written for Node.js
 
-I used it for an English Project. I wrote it in a single class period. It allowed me to use my iPad to remotely control the presentation, and inject new information in on the fly as I saw fit.
+I used it for an English Project, on the book "Hard Times" from Charles Dickens. I wrote it in a single class period, after noticing that many other students needed a partner to click through the powerpoint slides (causing issues with the presentation).
+
+This software allowed me to use my iPad to remotely control the presentation, tapping buttons, and also inject new information into the presentation on the fly as I saw fit.
+
 
 
 ## Running the server
